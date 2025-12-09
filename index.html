@@ -39,8 +39,7 @@
         // ポリゴンで線を描く関数(グラデーション付き)
         const drawLineWithGradation = (ctx, x0, y0, x1, y1, centerColor = null, edgeColor = 'rgba(0, 0, 0, 0%)') => {
             if (!centerColor) centerColor = ctx.strokeStyle;
-            const lineWidth = ctx.lineWidth * 2.5; // グラデーションを付けると細く見えるので補正する
-            const halfWidth = lineWidth / 2;
+            const halfWidth = ctx.lineWidth / 2; // 半分の幅
             // 1. 方向ベクトルの計算
             const dx = x1 - x0, dy = y1 - y0;
             // 2. 法線ベクトルの計算 (時計回りに90度回転)
@@ -121,6 +120,7 @@
             const is_polygon = radios[1].checked;
             ctx.strokeStyle = 'red';
             if (is_polygon) {
+                ctx.lineWidth *= 2.5; // グラデーションを付けると細く見えるので補正する。
                 drawLineWithGradation(ctx, px0, py0, px1, py1);
             } else {
                 drawLine(ctx, px0, py0, px1, py1);
