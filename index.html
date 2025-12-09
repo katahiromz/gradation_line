@@ -24,11 +24,9 @@
         let radios = document.getElementsByName('my-radio');
         let ctx = canvas.getContext('2d', { alpha: false });
         let anime = null; // アニメーション
-        let old_time = (new Date()).getTime(); // 処理フレームの時刻。
-        let clock_time = 0; // 映像を動かす変数。
-        let speed = 1.0; // 映像を動かすスピード。
+        let time = (new Date()).getTime(); // 処理フレームの時刻。
         let px0 = 0, py0 = 5, px1 = 50, py1 = 50; // 線の位置
-        let vx0 = 0.3, vy0 = -0.8, vx1 = 0.8, vy1 = -0.2; // 線の頂点の速度
+        let vx0 = 30, vy0 = -80, vx1 = 80, vy1 = -20; // 線の頂点の速度
 
         // 普通に線を描く関数
         const drawLine = (ctx, x0, y0, x1, y1) => {
@@ -39,7 +37,7 @@
         };
 
         // ポリゴンで線を描く関数(グラデーション付き)
-        const drawLineByPolygon = (ctx, x0, y0, x1, y1, lineColor = "255, 0, 0") => {
+        const drawLineByPolygon = (ctx, x0, y0, x1, y1, lineColor = "255, 255, 255") => {
             const lineWidth = ctx.lineWidth;
             const halfWidth = lineWidth / 2;
             // 1. 方向ベクトルの計算
@@ -94,17 +92,17 @@
             let width = canvas.width, height = canvas.height;
             // 経過時間を計算
             let new_time = (new Date()).getTime();
-            let diff_time = (new_time - old_time) / 1000.0;
-            old_time = new_time;
+            let diff_time = (new_time - time) / 1000.0; // 秒単位
+            time = new_time; // 時刻を更新
 
             // 黒で塗りつぶす
             ctx.clearRect(0, 0, width, height);
 
             // 線の位置を動かす
-            px0 += vx0 * diff_time * 100;
-            py0 += vy0 * diff_time * 100;
-            px1 += vx1 * diff_time * 100;
-            py1 += vy1 * diff_time * 100;
+            px0 += vx0 * diff_time;
+            py0 += vy0 * diff_time;
+            px1 += vx1 * diff_time;
+            py1 += vy1 * diff_time;
 
             // カベに当たったら跳ね返る
             if (px0 < 0) { px0 = 0; vx0 = -vx0; }
@@ -127,9 +125,6 @@
                 ctx.strokeStyle = 'red';
                 drawLine(ctx, px0, py0, px1, py1);
             }
-
-            // 時間を計算。
-            clock_time += diff_time * speed;
 
             // 次のアニメーションフレームを要求する
             if (anime)
