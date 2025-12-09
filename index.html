@@ -39,7 +39,7 @@
         // ポリゴンで線を描く関数(グラデーション付き)
         const drawLineWithGradation = (ctx, x0, y0, x1, y1, centerColor = null, edgeColor = 'rgba(0, 0, 0, 0%)') => {
             if (!centerColor) centerColor = ctx.strokeStyle;
-            const lineWidth = ctx.lineWidth;
+            const lineWidth = ctx.lineWidth * 2.5; // グラデーションを付けると細く見えるので補正する
             const halfWidth = lineWidth / 2;
             // 1. 方向ベクトルの計算
             const dx = x1 - x0, dy = y1 - y0;
