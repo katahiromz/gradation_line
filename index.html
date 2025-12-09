@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gradation_line</title>
+</head>
+<body>
+    <h1>グラデーション ライン</h1>
+
+    <canvas id="my-canvas" width="300" height="300"></canvas>
+
+    <form>
+        <label for="my-radio-0">
+            <input type="radio" id="my-radio-0" name="my-radio" value="normal"> ノーマル
+        </label>
+        <label for="my-radio-1">
+            <input type="radio" id="my-radio-1" name="my-radio" value="polygon" checked> グラデーション
+        </label>
+    </form>
+
+    <script>
+        let canvas = document.getElementById('my-canvas');
+        let radios = document.getElementsByName('my-radio');
+        let ctx = canvas.getContext('2d', { alpha: false });
+        let anime = null; // アニメーション
+        let old_time = (new Date()).getTime(); // 処理フレームの時刻。
+        let clock_time = 0; // 映像を動かす変数。
+        let speed = 1.0; // 映像を動かすスピード。
+        let px0 = 0, py0 = 5, px1 = 50, py1 = 50; // 線の位置
+        let vx0 = 0.3, vy0 = -0.8, vx1 = 0.8, vy1 = -0.2; // 線の頂点の速度
+
+        // 普通に線を描く関数
+        const drawLine = (ctx, x0, y0, x1, y1) => {
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.stroke();
+        };
+
+        // ポリゴンで線を描く関数(グラデーション付き)
+        const drawLineByPolygon = (ctx, x0, y0, x1, y1, lineColor = "255, 0, 0") => {
+            const lineWidth = ctx.lineWidth;
+            const halfWidth = lineWidth / 2;
+            // 1. 方向ベクトルの計算
+            const dx = x1 - x0, dy = y1 - y0;
+            // 2. 法線ベクトルの計算 (時計回りに90度回転)
+            const nx = dy, ny = -dx;
+            // 法線ベクトルを正規化（長さ1にする）
+            const len = Math.sqrt(nx * nx + ny * ny);
+            const normX = nx / len, normY = ny / len;
+            // 3. 矩形の4つの頂点を計算
+            // 始点P1から法線方向に +/- halfWidth オフセット
+            const p0x = x0 + normX * halfWidth;
+            const p0y = y0 + normY * halfWidth;
+            const p1x = x0 - normX * halfWidth;
+            const p1y = y0 - normY * halfWidth;
+            // 終点P2から法線方向に +/- halfWidth オフセット
+            const p2x = x1 - normX * halfWidth;
+            const p2y = y1 - normY * halfWidth;
+            const p3x = x1 + normX * halfWidth;
+            const p3y = y1 + normY * halfWidth;
+            // 4. 頂点を結んで多角形を作成
+            ctx.beginPath();
+            ctx.moveTo(p0x, p0y);
+            ctx.lineTo(p1x, p1y);
+            ctx.lineTo(p2x, p2y);
+            ctx.lineTo(p3x, p3y);
+            ctx.closePath();
+            // 5. グラデーションの作成
+            // 線の端（グラデーションの開始点と終了点）
+            // 線の中心から法線ベクトルの方向に halfWidth 分オフセットした点
+            const gradStartPointX = x0 - normX * halfWidth;
+            const gradStartPointY = y0 - normY * halfWidth;
+            const gradEndPointX = x0 + normX * halfWidth;
+            const gradEndPointY = y0 + normY * halfWidth;
+            const gradient = ctx.createLinearGradient(
+                gradStartPointX, gradStartPointY,
+                gradEndPointX, gradEndPointY
+            );
+            // 中心: 不透明度 1.0 (50%)
+            gradient.addColorStop(0.5, `rgba(${lineColor}, 1.0)`);
+            // 端: 不透明度 0.0 (0% と 100%)
+            gradient.addColorStop(0.0, `rgba(${lineColor}, 0.0)`);
+            gradient.addColorStop(1.0, `rgba(${lineColor}, 0.0)`);
+            // 5. 塗りつぶし
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        };
+
+        // 描画する関数
+        const render = () => {
+            // キャンバスのサイズ
+            let width = canvas.width, height = canvas.height;
+            // 経過時間を計算
+            let new_time = (new Date()).getTime();
+            let diff_time = (new_time - old_time) / 1000.0;
+            old_time = new_time;
+
+            // 黒で塗りつぶす
+            ctx.clearRect(0, 0, width, height);
+
+            // 線の位置を動かす
+            px0 += vx0 * diff_time * 100;
+            py0 += vy0 * diff_time * 100;
+            px1 += vx1 * diff_time * 100;
+            py1 += vy1 * diff_time * 100;
+
+            // カベに当たったら跳ね返る
+            if (px0 < 0) { px0 = 0; vx0 = -vx0; }
+            if (px1 < 0) { px1 = 0; vx1 = -vx1; }
+            if (py0 < 0) { py0 = 0; vy0 = -vy0; }
+            if (py1 < 0) { py1 = 0; vy1 = -vy1; }
+            if (px0 > width) { px0 = width; vx0 = -vx0; }
+            if (px1 > width) { px1 = width; vx1 = -vx1; }
+            if (py0 > height) { py0 = height; vy0 = -vy0; }
+            if (py1 > height) { py1 = height; vy1 = -vy1; }
+
+            // 線を描く
+            ctx.lineWidth = 30;
+            console.assert(radios.length == 2);
+            const is_polygon = radios[1].checked;
+            if (is_polygon) {
+                const color = '255, 0, 0'; // 赤
+                drawLineByPolygon(ctx, px0, py0, px1, py1, color);
+            } else {
+                ctx.strokeStyle = 'red';
+                drawLine(ctx, px0, py0, px1, py1);
+            }
+
+            // 時間を計算。
+            clock_time += diff_time * speed;
+
+            // 次のアニメーションフレームを要求する
+            if (anime)
+                anime = window.requestAnimationFrame(render);
+        };
+
+        // アニメーションを開始する
+        anime = window.requestAnimationFrame(render);
+    </script>
+</body>
+</html>
