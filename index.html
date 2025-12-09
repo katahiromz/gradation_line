@@ -37,7 +37,8 @@
         };
 
         // ポリゴンで線を描く関数(グラデーション付き)
-        const drawLineByPolygon = (ctx, x0, y0, x1, y1, lineColor = "255, 255, 255") => {
+        const drawLineWithGradation = (ctx, x0, y0, x1, y1, centerColor = null, edgeColor = 'rgba(0, 0, 0, 0%)') => {
+            if (!centerColor) centerColor = ctx.strokeStyle;
             const lineWidth = ctx.lineWidth;
             const halfWidth = lineWidth / 2;
             // 1. 方向ベクトルの計算
@@ -74,13 +75,13 @@
             const gradEndPointY = y0 + normY * halfWidth;
             const gradient = ctx.createLinearGradient(
                 gradStartPointX, gradStartPointY,
-                gradEndPointX, gradEndPointY
-            );
-            // 中心: 不透明度 1.0 (50%)
-            gradient.addColorStop(0.5, `rgba(${lineColor}, 1.0)`);
-            // 端: 不透明度 0.0 (0% と 100%)
-            gradient.addColorStop(0.0, `rgba(${lineColor}, 0.0)`);
-            gradient.addColorStop(1.0, `rgba(${lineColor}, 0.0)`);
+                gradEndPointX, gradEndPointY);
+            // 中心 (40%～60%)
+            gradient.addColorStop(0.4, centerColor);
+            gradient.addColorStop(0.6, centerColor);
+            // 端 (0% と 100%)
+            gradient.addColorStop(0.0, edgeColor);
+            gradient.addColorStop(1.0, edgeColor);
             // 5. 塗りつぶし
             ctx.fillStyle = gradient;
             ctx.fill();
@@ -118,11 +119,10 @@
             ctx.lineWidth = 30;
             console.assert(radios.length == 2);
             const is_polygon = radios[1].checked;
+            ctx.strokeStyle = 'red';
             if (is_polygon) {
-                const color = '255, 0, 0'; // 赤
-                drawLineByPolygon(ctx, px0, py0, px1, py1, color);
+                drawLineWithGradation(ctx, px0, py0, px1, py1);
             } else {
-                ctx.strokeStyle = 'red';
                 drawLine(ctx, px0, py0, px1, py1);
             }
 
