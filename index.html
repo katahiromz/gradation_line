@@ -28,7 +28,15 @@
         let px0 = 0, py0 = 5, px1 = 50, py1 = 50; // 線の位置
         let vx0 = 30, vy0 = -80, vx1 = 80, vy1 = -20; // 線の頂点の速度
 
-        // 普通に線を描く関数
+        /**
+         * 指定された2点間に直線を描画する。
+         * この関数は、描画スタイル（色や太さ）の設定は行わず、パスの定義と実行のみを行う。
+         * * @param {CanvasRenderingContext2D} ctx - 描画に使用するCanvas 2Dコンテキスト。
+         * @param {number} x0 - 始点 (P0) のX座標。
+         * @param {number} y0 - 始点 (P0) のY座標。
+         * @param {number} x1 - 終点 (P1) のX座標。
+         * @param {number} y1 - 終点 (P1) のY座標。
+         */
         const drawLine = (ctx, x0, y0, x1, y1) => {
             ctx.beginPath();
             ctx.moveTo(x0, y0);
@@ -36,9 +44,18 @@
             ctx.stroke();
         };
 
-        // ポリゴンで線を描く関数(グラデーション付き)
-        const drawLineWithGradation = (ctx, x0, y0, x1, y1, centerColor = null, edgeColor = 'rgba(0, 0, 0, 0%)') => {
-            if (!centerColor) centerColor = ctx.strokeStyle;
+        /**
+         * 2点間に幅を持った線（矩形ポリゴン）を描画し、その幅に対して垂直方向のグラデーションを適用する。
+         * これにより、線の中心が最も濃く、端に向かって色が薄くなる（または透明になる）視覚効果が得られる。
+         * * @param {CanvasRenderingContext2D} ctx - 描画に使用するCanvas 2Dコンテキスト。
+         * @param {number} x0 - 始点 (P0) のX座標。
+         * @param {number} y0 - 始点 (P0) のY座標。
+         * @param {number} x1 - 終点 (P1) のX座標。
+         * @param {number} y1 - 終点 (P1) のY座標。
+         * @param {string} [centerColor=ctx.strokeStyle] - 線の中心に適用する色。指定がない場合は現在の strokeStyle を使用。
+         * @param {string} [edgeColor='rgba(0, 0, 0, 0%)'] - 線の両端（エッジ）に適用する色（通常は透明）。
+         */
+        const drawLineWithGradation = (ctx, x0, y0, x1, y1, centerColor = ctx.strokeStyle, edgeColor = 'rgba(0, 0, 0, 0%)') => {
             const halfWidth = ctx.lineWidth / 2; // 半分の幅
             // 1. 方向ベクトルの計算
             const dx = x1 - x0, dy = y1 - y0;
