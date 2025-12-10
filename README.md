@@ -12,7 +12,7 @@ JavaScriptでグラデーション付きの線を描きます。
 /**
  * 2点間に幅を持った線（矩形ポリゴン）を描画し、その幅に対して垂直方向のグラデーションを適用する。
  * これにより、線の中心が最も濃く、端に向かって色が薄くなる（または透明になる）視覚効果が得られる。
- * * @param {CanvasRenderingContext2D} ctx - 描画に使用するCanvas 2Dコンテキスト。
+ * @param {CanvasRenderingContext2D} ctx - 描画に使用するCanvas 2Dコンテキスト。
  * @param {number} x0 - 始点 (P0) のX座標。
  * @param {number} y0 - 始点 (P0) のY座標。
  * @param {number} x1 - 終点 (P1) のX座標。
