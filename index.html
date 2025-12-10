@@ -133,9 +133,9 @@
 
             // 線を描く
             ctx.lineWidth = 30;
-            console.assert(radios.length == 2);
             ctx.strokeStyle = 'red';
 
+            console.assert(radios.length == 2);
             const is_gradient = radios[1].checked;
             if (is_gradient) { // グラデーションを付けるか？
                 ctx.lineWidth *= 2.5; // グラデーションを付けると細く見えるので補正する。
